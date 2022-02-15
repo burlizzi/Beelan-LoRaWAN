@@ -562,7 +562,7 @@ bool LORA_join_Accept(sBuffer *Data_Rx,sLoRa_Session *Session_Data, sLoRa_OTAA *
     	Message->MAC_Header = RFM_Data[0];
 
 		//Join Accept message
-		if(Message->MAC_Header == 0x20)
+		if((Message->MAC_Header & 0xE0) == 0x20)
 		{	
 			//Copy the data into the data array
 			for(i = 0x00; i < RFM_Package.Counter; i++)
