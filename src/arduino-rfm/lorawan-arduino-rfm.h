@@ -89,7 +89,7 @@ public:
     void setFrameCounter(unsigned int FrameCounter);
 
 private:
-    void randomChannel();
+    void randomChannel(bool isJoin=false);
 
 private:
     // Messages
