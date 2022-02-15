@@ -88,10 +88,9 @@ public:
     unsigned int getFrameCounter();
     void setFrameCounter(unsigned int FrameCounter);
 
-private:
+protected:
     void randomChannel(bool isJoin=false);
 
-private:
     // Messages
     unsigned char Data_Tx[MAX_UPLINK_PAYLOAD_SIZE];
     sBuffer Buffer_Tx;
