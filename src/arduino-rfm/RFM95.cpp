@@ -30,7 +30,7 @@
 #include <SPI.h>
 #include "RFM95.h"
 #include "Config.h"
-void xxx(const char *format, ...);
+
 /**
  *  Lora Frequencies
  *    Tested on all subbands in US915 
@@ -750,7 +750,7 @@ message_t RFM_Get_Package(sBuffer *RFM_Rx_Package)
     else
     {
       Message_Status = WRONG_MESSAGE;
-      ESP_LOGD("mac","wrong message");
+      xxx("wrong message");
     }
   }
   RFM_Package_Location = RFM_Read(0x10); /*Read start position of received package*/
