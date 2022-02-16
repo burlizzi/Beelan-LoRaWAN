@@ -602,6 +602,8 @@ bool LORA_join_Accept(sBuffer *Data_Rx,sLoRa_Session *Session_Data, sLoRa_OTAA *
 			else
 				Message_Status = WRONG_MESSAGE;
 
+			xxx("mic %d",Message_Status);
+
 			//Get Key's and data from package when MIC is OK
 			if(Message_Status == MIC_OK)
 			{
