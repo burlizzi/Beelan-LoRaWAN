@@ -55,15 +55,11 @@ bool LoRaWANClass::init(void)
     currentChannel = MULTI;
 
     // Initialise session data struct (Semtech default key)
-    memset(Address_Tx, 0x00, 4);
-    memset(NwkSKey, 0x00, 16);
-    memset(AppSKey, 0x00, 16);
-
-    Frame_Counter_Tx = 0x0000;
-    Session_Data.NwkSKey = NwkSKey;
-    Session_Data.AppSKey = AppSKey;
-    Session_Data.DevAddr = Address_Tx;
-    Session_Data.Frame_Counter = &Frame_Counter_Tx;
+    memset(Session_Data.DevAddr, 0x00, 4);
+    memset(Session_Data.NwkSKey, 0x00, 16);
+    memset(Session_Data.AppSKey, 0x00, 16);
+    ESP_LOGE("frame","zero(%d)=%d",Session_Data.Frame_Counter,__LINE__);
+    Session_Data.Frame_Counter = 0x0000;
 
     //Initialize OTAA data struct
     memset(DevEUI, 0x00, 8);
@@ -87,7 +83,7 @@ bool LoRaWANClass::init(void)
 #if defined(AS_923)
     LoRa_Settings.Datarate_Rx = 0x02; //set to SF10 BW 125 kHz
 #elif defined(EU_868)
-    LoRa_Settings.Datarate_Rx = 0x03;                //set to SF9 BW 125 kHz
+    LoRa_Settings.Datarate_Rx = LoRa_Settings.RX2_Datarate_Rx = 0x03;            //set to SF9 BW 125 kHz
 #else //US_915 or AU_915
     LoRa_Settings.Datarate_Rx = 0x0C;                //set to SF8 BW 500 kHz
 #endif
@@ -193,7 +189,8 @@ void LoRaWANClass::setDevEUI(const char *devEUI_in)
     for (byte i = 0; i < 8; ++i)
         DevEUI[i] = ASCII2Hex(devEUI_in[i * 2], devEUI_in[(i * 2) + 1]);
     //Reset frame counter
-    Frame_Counter_Tx = 0x0000;
+    ESP_LOGE("frame","zero(%d)=%d",Session_Data.Frame_Counter,__LINE__);
+    Session_Data.Frame_Counter = 0x0000;
 
     //Reset RFM command status
     RFM_Command_Status = NO_RFM_COMMAND;
@@ -204,7 +201,8 @@ void LoRaWANClass::setAppEUI(const char *appEUI_in)
     for (byte i = 0; i < 8; ++i)
         AppEUI[i] = ASCII2Hex(appEUI_in[i * 2], appEUI_in[(i * 2) + 1]);
     //Reset frame counter
-    Frame_Counter_Tx = 0x0000;
+    ESP_LOGE("frame","zero(%d)=%d",Session_Data.Frame_Counter,__LINE__);
+    Session_Data.Frame_Counter = 0x0000;
 
     //Reset RFM command status
     RFM_Command_Status = NO_RFM_COMMAND;
@@ -215,7 +213,8 @@ void LoRaWANClass::setAppKey(const char *appKey_in)
     for (byte i = 0; i < 16; ++i)
         AppKey[i] = ASCII2Hex(appKey_in[i * 2], appKey_in[(i * 2) + 1]);
     //Reset frame counter
-    Frame_Counter_Tx = 0x0000;
+    ESP_LOGE("frame","zero(%d)=%d",Session_Data.Frame_Counter,__LINE__);
+    Session_Data.Frame_Counter = 0x0000;
 
     //Reset RFM command status
     RFM_Command_Status = NO_RFM_COMMAND;
@@ -224,10 +223,11 @@ void LoRaWANClass::setAppKey(const char *appKey_in)
 void LoRaWANClass::setNwkSKey(const char *NwkKey_in)
 {
     for (uint8_t i = 0; i < 16; ++i)
-        NwkSKey[i] = ASCII2Hex(NwkKey_in[i * 2], NwkKey_in[(i * 2) + 1]);
+        Session_Data.NwkSKey[i] = ASCII2Hex(NwkKey_in[i * 2], NwkKey_in[(i * 2) + 1]);
 
     //Reset frame counter
-    Frame_Counter_Tx = 0x0000;
+    ESP_LOGE("frame","zero(%d)=%d",Session_Data.Frame_Counter,__LINE__);
+    Session_Data.Frame_Counter = 0x0000;
 
     //Reset RFM command status
     RFM_Command_Status = NO_RFM_COMMAND;
@@ -236,10 +236,11 @@ void LoRaWANClass::setNwkSKey(const char *NwkKey_in)
 void LoRaWANClass::setAppSKey(const char *ApskKey_in)
 {
     for (uint8_t i = 0; i < 16; ++i)
-        AppSKey[i] = ASCII2Hex(ApskKey_in[i * 2], ApskKey_in[(i * 2) + 1]);
+        Session_Data.AppSKey[i] = ASCII2Hex(ApskKey_in[i * 2], ApskKey_in[(i * 2) + 1]);
 
     //Reset frame counter
-    Frame_Counter_Tx = 0x0000;
+    ESP_LOGE("frame","zero(%d)=%d",Session_Data.Frame_Counter,__LINE__);
+    Session_Data.Frame_Counter = 0x0000;
 
     //Reset RFM command status
     RFM_Command_Status = NO_RFM_COMMAND;
@@ -247,16 +248,17 @@ void LoRaWANClass::setAppSKey(const char *ApskKey_in)
 
 void LoRaWANClass::setDevAddr(const char *devAddr_in)
 {
-    memset(Session_Data.DevAddr, 0x30, sizeof(Session_Data.DevAddr));
+    
 
     //Check if it is a set command and there is enough data sent
-    Address_Tx[0] = ASCII2Hex(devAddr_in[0], devAddr_in[1]);
-    Address_Tx[1] = ASCII2Hex(devAddr_in[2], devAddr_in[3]);
-    Address_Tx[2] = ASCII2Hex(devAddr_in[4], devAddr_in[5]);
-    Address_Tx[3] = ASCII2Hex(devAddr_in[6], devAddr_in[7]);
+    Session_Data.DevAddr[0] = ASCII2Hex(devAddr_in[0], devAddr_in[1]);
+    Session_Data.DevAddr[1] = ASCII2Hex(devAddr_in[2], devAddr_in[3]);
+    Session_Data.DevAddr[2] = ASCII2Hex(devAddr_in[4], devAddr_in[5]);
+    Session_Data.DevAddr[3] = ASCII2Hex(devAddr_in[6], devAddr_in[7]);
 
     //Reset frame counter
-    Frame_Counter_Tx = 0x0000;
+    ESP_LOGE("frame","zero(%d)=%d",Session_Data.Frame_Counter,__LINE__);
+    Session_Data.Frame_Counter = 0x0000;
 
     //Reset RFM command status
     RFM_Command_Status = NO_RFM_COMMAND;
@@ -472,12 +474,12 @@ void LoRaWANClass::randomChannel(bool isJoin)
 
 unsigned int LoRaWANClass::getFrameCounter()
 {
-    return Frame_Counter_Tx;
+    return Session_Data.Frame_Counter;
 }
 
 void LoRaWANClass::setFrameCounter(unsigned int FrameCounter)
 {
-    Frame_Counter_Tx = FrameCounter;
+    Session_Data.Frame_Counter = FrameCounter;
 }
 
 // define lora objet

@@ -99,10 +99,10 @@ protected:
     sLoRa_Message Message_Rx;
 
     // Declare ABP session
-    unsigned char Address_Tx[4];
-    unsigned char NwkSKey[16];
-    unsigned char AppSKey[16];
-    unsigned int Frame_Counter_Tx;
+//    unsigned char Address_Tx[4];
+//    unsigned char NwkSKey[16];
+//    unsigned char AppSKey[16];
+//    unsigned int Frame_Counter_Tx;
     sLoRa_Session Session_Data;
 
     // Declare OTAA data struct

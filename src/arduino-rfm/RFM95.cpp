@@ -30,7 +30,7 @@
 #include <SPI.h>
 #include "RFM95.h"
 #include "Config.h"
-
+void xxx(const char *format, ...);
 /**
  *  Lora Frequencies
  *    Tested on all subbands in US915 
@@ -676,6 +676,7 @@ message_t RFM_Single_Receive(sSettings *LoRa_Settings)
   if(digitalRead(RFM_pins.DIO0) == HIGH)
   {
 	  Message_Status = NEW_MESSAGE;
+    xxx("new msg RSSI=%d",RFM_Get_Rssi()-157);
   }
 
   return Message_Status;
@@ -701,7 +702,7 @@ void RFM_Continuous_Receive(sSettings *LoRa_Settings)
 	//Change Datarate and channel.
   // This depends on regional parameters
 #ifdef EU_868
-  RFM_Change_Datarate(SF12BW125);
+  RFM_Change_Datarate(LoRa_Settings->RX2_Datarate_Rx);
   RFM_Change_Channel(CHRX2);
 #else
   //Datarate for downlink should be 8 but testing on 10
@@ -734,7 +735,7 @@ message_t RFM_Get_Package(sBuffer *RFM_Rx_Package)
   unsigned char i;
   unsigned char RFM_Interrupts = 0x00;
   unsigned char RFM_Package_Location = 0x00;
-  message_t Message_Status;
+  message_t Message_Status=WRONG_MESSAGE;
 
   //Get interrupt register
   RFM_Interrupts = RFM_Read(0x12);
@@ -744,10 +745,12 @@ message_t RFM_Get_Package(sBuffer *RFM_Rx_Package)
     if((RFM_Interrupts & 0x20) != 0x20)  //Check CRC
     {
       Message_Status = CRC_OK;
+      xxx("msg irq RSSI=%d",RFM_Get_Rssi()-157);
     }
     else
     {
       Message_Status = WRONG_MESSAGE;
+      ESP_LOGD("mac","wrong message");
     }
   }
   RFM_Package_Location = RFM_Read(0x10); /*Read start position of received package*/

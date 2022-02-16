@@ -56,10 +56,10 @@ typedef struct {
 
 //Struct used to store session data of a LoRaWAN session
 typedef struct {
-    unsigned char *NwkSKey;
-    unsigned char *AppSKey;
-    unsigned char *DevAddr;
-    unsigned int  *Frame_Counter;
+    unsigned char NwkSKey[16];
+    unsigned char AppSKey[16];
+    unsigned char DevAddr[4];
+    unsigned int  Frame_Counter;
 } sLoRa_Session;
 
 typedef struct {
@@ -90,10 +90,12 @@ typedef struct {
     unsigned char Mote_Class;		//0x00 Class A, 0x01 Class C
     unsigned char Datarate_Tx;		//See RFM file
     unsigned char Datarate_Rx;		//See RFM file
+    unsigned char RX2_Datarate_Rx;		//See RFM file
     unsigned char Channel_Tx;		//See RFM file
     unsigned char Channel_Rx;		//See RFM filed
     unsigned char Channel_Hopping;	//0x00 No hopping, 0x01 Hopping
     unsigned char Transmit_Power;	//0x00 to 0x0F
+
 } sSettings;
 
 typedef enum {
