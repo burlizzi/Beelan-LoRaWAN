@@ -328,7 +328,7 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
 	//if CRC ok breakdown package
 	if(Message_Status == CRC_OK)
 	{	
-		ESP_LOGD("mac","crc ok");
+		xxx("crc ok");
 		//Get MAC_Header
     	Message->MAC_Header = RFM_Data[0];
 
@@ -369,12 +369,12 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
       		if(MIC_Check == 0x04)
       		{
       			Message_Status = MIC_OK;
-				ESP_LOGD("mac","mic ok");
+				xxx("mic ok");
       		}
       		else
       		{
       			Message_Status = WRONG_MESSAGE;
-				ESP_LOGD("mac","wrong mic");
+				xxx("wrong mic");
       		}
 
       		Address_Check = 0;
@@ -393,12 +393,12 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
 		  	if(Address_Check == 0x04)
 		  	{
 				Message_Status = ADDRESS_OK;
-				ESP_LOGD("mac","address ok");
+				xxx("address ok");
 		  	}
 		  	else
 		  	{
 				Message_Status = WRONG_MESSAGE;
-				ESP_LOGD("mac","wrong address");
+				xxx("wrong address");
 		  	}
 
 			//if the address is OK then decrypt the data
@@ -569,7 +569,7 @@ bool LORA_join_Accept(sBuffer *Data_Rx,sLoRa_Session *Session_Data, sLoRa_OTAA *
 		//Join Accept message
 		if((Message->MAC_Header & 0xE0) == 0x20)
 		{	
-			ESP_LOGD("mac","join message");
+			xxx("join message");
 			//Copy the data into the data array
 			for(i = 0x00; i < RFM_Package.Counter; i++)
 				Data_Rx->Data[i] = RFM_Package.Data[i];
