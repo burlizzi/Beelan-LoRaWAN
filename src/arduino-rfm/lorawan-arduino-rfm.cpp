@@ -83,7 +83,7 @@ bool LoRaWANClass::init(void)
 #if defined(AS_923)
     LoRa_Settings.Datarate_Rx = 0x02; //set to SF10 BW 125 kHz
 #elif defined(EU_868)
-    LoRa_Settings.Datarate_Rx = Session_Data.RX2DR = 0x03;            //set to SF9 BW 125 kHz
+    LoRa_Settings.Datarate_Rx = Session_Data.RX2DR = SF12BW125;            //set to SF9 BW 125 kHz
 #else //US_915 or AU_915
     LoRa_Settings.Datarate_Rx = 0x0C;                //set to SF8 BW 500 kHz
 #endif

@@ -577,7 +577,7 @@ bool LORA_join_Accept(sBuffer *Data_Rx,sLoRa_Session *Session_Data, sLoRa_OTAA *
 				s<<std::hex;
 				for (size_t i = 0; i < RFM_Package.Counter; i++)
 				{
-					s<<RFM_Data[i]<<' ';
+					s<<(int)RFM_Data[i]<<' ';
 				}
 				xxx(s.str().c_str());
 
@@ -627,7 +627,7 @@ bool LORA_join_Accept(sBuffer *Data_Rx,sLoRa_Session *Session_Data, sLoRa_OTAA *
 					s<<std::hex;
 					for (size_t i = 0; i < RFM_Package.Counter; i++)
 					{
-						s<<Data_Rx->Data[i]<<' ';
+						s<<(int)Data_Rx->Data[i]<<' ';
 					}
 					xxx(s.str().c_str());
 
@@ -682,7 +682,21 @@ bool LORA_join_Accept(sBuffer *Data_Rx,sLoRa_Session *Session_Data, sLoRa_OTAA *
 				Data_Rx->Counter = 0x00;
 
 				//get the rx2 DR
-				Session_Data->RX2DR=Data_Rx->Data[11] & 0xf;
+				Session_Data->RX2DR=(dataRates_t)(Data_Rx->Data[11] & 0xf);
+
+
+
+				int dlen = 13;
+				if (LMIC.frame[13 + 15] == 0) { // must be CFList type 0
+					for( u1_t chidx=3; chidx<8 && dlen<RFM_Package.Counter; chidx++, dlen+=3 ) {
+						s4_t freq = rdFreq(&Data_Rx->Data[dlen]);
+						if( freq > 0 ) {
+							//setupChannel_dyn(chidx, freq, 0);
+							xxx("Setup channel[idx=%d,freq=%.1F]\r\n", chidx, freq, 6);
+					}
+				}
+
+
 				xxx("received DR=SF%d",12-Session_Data->RX2DR);
 
 #ifdef DEBUG
