@@ -38,6 +38,7 @@
 #include "Struct.h"
 #include "Config.h"
 #include "Arduino.h"
+#include <sstream>
 
 /*
 *****************************************************************************************
@@ -97,7 +98,7 @@ void LORA_Cycle(sBuffer *Data_Tx, sBuffer *Data_Rx, RFM_command_t *RFM_Command, 
 			LoRa_Settings->Datarate_Rx = SF12BW500;   //set RX2 datarate 12
 			#elif defined(EU_868)
 			LoRa_Settings->Channel_Rx = CHRX2;    // set Rx2 channel 869.525 MHZ 
-			LoRa_Settings->Datarate_Rx = LoRa_Settings->RX2_Datarate_Rx;   //set RX2 datarate 12
+			LoRa_Settings->Datarate_Rx = Session_Data->RX2DR;   //set RX2 datarate 12
 			#endif
 			LORA_Receive_Data(Data_Rx, Session_Data, OTAA_Data, Message_Rx, LoRa_Settings);  //BUG DETECT SENDED PACKET ALWAYS (IT DOES UPDATE)
 		}
@@ -130,7 +131,7 @@ void LORA_Cycle(sBuffer *Data_Tx, sBuffer *Data_Rx, RFM_command_t *RFM_Command, 
 
 		//Configure datarate and channel for RX2
 		LoRa_Settings->Channel_Rx = 0x08;    // set RX2 channel 
-		LoRa_Settings->Datarate_Rx = LoRa_Settings->RX2_Datarate_Rx;   //set RX2 datarate
+		LoRa_Settings->Datarate_Rx = Session_Data->RX2DR;   //set RX2 datarate
 		//Receive Data RX2 
 		//If class A timeout will apply
 		//If class C continous Rx will happen
@@ -322,7 +323,8 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
 		if(LoRa_Settings->Mote_Class == CLASS_C)
 		{
 			//Switch RFM to Continuous Receive
-			RFM_Continuous_Receive(LoRa_Settings);
+			
+			RFM_Continuous_Receive(LoRa_Settings,Session_Data->RX2DR);
 		}
 	}
 	//if CRC ok breakdown package
@@ -569,7 +571,18 @@ bool LORA_join_Accept(sBuffer *Data_Rx,sLoRa_Session *Session_Data, sLoRa_OTAA *
 		//Join Accept message
 		if((Message->MAC_Header & 0xE0) == 0x20)
 		{	
-			xxx("join message");
+			xxx("join message, len=%d",RFM_Package.Counter);
+			{
+				std::stringstream s;
+				s<<std::hex;
+				for (size_t i = 0; i < RFM_Package.Counter; i++)
+				{
+					s<<RFM_Data[i]<<' ';
+				}
+				xxx(s.str().c_str());
+
+			}
+
 			//Copy the data into the data array
 			for(i = 0x00; i < RFM_Package.Counter; i++)
 				Data_Rx->Data[i] = RFM_Package.Data[i];
@@ -607,6 +620,19 @@ bool LORA_join_Accept(sBuffer *Data_Rx,sLoRa_Session *Session_Data, sLoRa_OTAA *
 			//Get Key's and data from package when MIC is OK
 			if(Message_Status == MIC_OK)
 			{
+
+				xxx("decrypted");
+				{
+					std::stringstream s;
+					s<<std::hex;
+					for (size_t i = 0; i < RFM_Package.Counter; i++)
+					{
+						s<<Data_Rx->Data[i]<<' ';
+					}
+					xxx(s.str().c_str());
+
+				}
+
 				//Get AppNonce
 				for(i = 0; i< 3; i++)
 					OTAA_Data->AppNonce[i] = Data_Rx->Data[i+1];
@@ -654,6 +680,10 @@ bool LORA_join_Accept(sBuffer *Data_Rx,sLoRa_Session *Session_Data, sLoRa_OTAA *
 
 				//Clear Data counter
 				Data_Rx->Counter = 0x00;
+
+				//get the rx2 DR
+				Session_Data->RX2DR=Data_Rx->Data[11] & 0xf;
+				xxx("received DR=SF%d",12-Session_Data->RX2DR);
 
 #ifdef DEBUG
 				Serial.print(F("NwkSKey: "));

@@ -83,7 +83,7 @@ bool LoRaWANClass::init(void)
 #if defined(AS_923)
     LoRa_Settings.Datarate_Rx = 0x02; //set to SF10 BW 125 kHz
 #elif defined(EU_868)
-    LoRa_Settings.Datarate_Rx = LoRa_Settings.RX2_Datarate_Rx = 0x03;            //set to SF9 BW 125 kHz
+    LoRa_Settings.Datarate_Rx = Session_Data.RX2DR = 0x03;            //set to SF9 BW 125 kHz
 #else //US_915 or AU_915
     LoRa_Settings.Datarate_Rx = 0x0C;                //set to SF8 BW 500 kHz
 #endif
@@ -285,7 +285,7 @@ void LoRaWANClass::setDeviceClass(devclass_t dev_class)
     }
     else
     {
-        RFM_Continuous_Receive(&LoRa_Settings);
+        RFM_Continuous_Receive(&LoRa_Settings,Session_Data.RX2DR);
     }
 
     //Reset RFM command

@@ -54,72 +54,6 @@ typedef struct {
     unsigned char Counter;
 } sBuffer;
 
-//Struct used to store session data of a LoRaWAN session
-typedef struct {
-    unsigned char NwkSKey[16];
-    unsigned char AppSKey[16];
-    unsigned char DevAddr[4];
-    unsigned int  Frame_Counter;
-} sLoRa_Session;
-
-typedef struct {
-    unsigned char *DevEUI;
-    unsigned char *AppEUI;
-    unsigned char *AppKey;
-    unsigned char *DevNonce;
-    unsigned char *AppNonce;
-    unsigned char *NetID;
-} sLoRa_OTAA;
-
-//Struct to store information of a LoRaWAN message to transmit or received
-typedef struct{
-    unsigned char MAC_Header;
-    unsigned char DevAddr[4];
-    unsigned char Frame_Control;
-    unsigned int  Frame_Counter;
-    unsigned char Frame_Port;
-    unsigned char Frame_Options[15];
-    unsigned char MIC[4];
-    unsigned char Direction;
-} sLoRa_Message;
-
-//Struct used for storing settings of the mote
-typedef struct {
-    unsigned char Confirm;		//0x00 Unconfirmed, 0x01 Confirmed
-    unsigned char Mport;                //Port 1-223
-    unsigned char Mote_Class;		//0x00 Class A, 0x01 Class C
-    unsigned char Datarate_Tx;		//See RFM file
-    unsigned char Datarate_Rx;		//See RFM file
-    unsigned char RX2_Datarate_Rx;		//See RFM file
-    unsigned char Channel_Tx;		//See RFM file
-    unsigned char Channel_Rx;		//See RFM filed
-    unsigned char Channel_Hopping;	//0x00 No hopping, 0x01 Hopping
-    unsigned char Transmit_Power;	//0x00 to 0x0F
-
-} sSettings;
-
-typedef enum {
-  CH0 = 0,
-  CH1 = 1,
-  CH2 = 2,
-  CH3 = 3,
-  CH4 = 4,
-  CH5 = 5,
-  CH6 = 6,
-  CH7 = 7,
-#ifdef EU_868
-  CHRX2 = 8,
-#else
-  CH8 = 8,
-#endif
-  MULTI = 20
-} channel_t;
-
-
-typedef enum {
-    RFO_PIN  = 0,
-    PA_BOOST_PIN = 1
-} txPin_t;
 
 typedef enum {
 #if defined(US_915)
@@ -154,6 +88,75 @@ typedef enum {
     SF7BW250    = 0x06
 #endif
 } dataRates_t;
+
+
+//Struct used to store session data of a LoRaWAN session
+typedef struct {
+    unsigned char NwkSKey[16];
+    unsigned char AppSKey[16];
+    unsigned char DevAddr[4];
+    unsigned int  Frame_Counter;
+    dataRates_t   RX2DR;
+} sLoRa_Session;
+
+typedef struct {
+    unsigned char *DevEUI;
+    unsigned char *AppEUI;
+    unsigned char *AppKey;
+    unsigned char *DevNonce;
+    unsigned char *AppNonce;
+    unsigned char *NetID;
+} sLoRa_OTAA;
+
+//Struct to store information of a LoRaWAN message to transmit or received
+typedef struct{
+    unsigned char MAC_Header;
+    unsigned char DevAddr[4];
+    unsigned char Frame_Control;
+    unsigned int  Frame_Counter;
+    unsigned char Frame_Port;
+    unsigned char Frame_Options[15];
+    unsigned char MIC[4];
+    unsigned char Direction;
+} sLoRa_Message;
+
+//Struct used for storing settings of the mote
+typedef struct {
+    unsigned char Confirm;		//0x00 Unconfirmed, 0x01 Confirmed
+    unsigned char Mport;                //Port 1-223
+    unsigned char Mote_Class;		//0x00 Class A, 0x01 Class C
+    unsigned char Datarate_Tx;		//See RFM file
+    unsigned char Datarate_Rx;		//See RFM file
+    unsigned char Channel_Tx;		//See RFM file
+    unsigned char Channel_Rx;		//See RFM filed
+    unsigned char Channel_Hopping;	//0x00 No hopping, 0x01 Hopping
+    unsigned char Transmit_Power;	//0x00 to 0x0F
+
+} sSettings;
+
+typedef enum {
+  CH0 = 0,
+  CH1 = 1,
+  CH2 = 2,
+  CH3 = 3,
+  CH4 = 4,
+  CH5 = 5,
+  CH6 = 6,
+  CH7 = 7,
+#ifdef EU_868
+  CHRX2 = 8,
+#else
+  CH8 = 8,
+#endif
+  MULTI = 20
+} channel_t;
+
+
+typedef enum {
+    RFO_PIN  = 0,
+    PA_BOOST_PIN = 1
+} txPin_t;
+
 
 typedef enum {CLASS_A, CLASS_C} devclass_t;
 
