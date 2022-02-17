@@ -552,6 +552,7 @@ bool LORA_join_Accept(sBuffer *Data_Rx,sLoRa_Session *Session_Data, sLoRa_OTAA *
 
 	message_t Message_Status = NO_MESSAGE;
 
+	LoRa_Settings->Datarate_Rx = SF12BW125;
 	//RFM to single receive
 	Message_Status = RFM_Single_Receive(LoRa_Settings);  
 	//If there is a message received get the data from the RFM
