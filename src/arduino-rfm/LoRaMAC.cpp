@@ -689,9 +689,9 @@ bool LORA_join_Accept(sBuffer *Data_Rx,sLoRa_Session *Session_Data, sLoRa_OTAA *
 
 				int dlen = 13;
 				if (Data_Rx->Data[13 + 15] == 0) { // must be CFList type 0
-					xxx("let the freq sho begin");
+					xxx("let the freq show begin");
 					for( unsigned char chidx=3; chidx<8 && dlen<RFM_Package.Counter; chidx++, dlen+=3 ) {
-						auto freq = ((Data_Rx->Data[dlen+2] << 16) | (Data_Rx->Data[dlen+1] << 8) | Data_Rx->Data[dlen]) * 100;
+						float freq = ((Data_Rx->Data[dlen+2] << 16) | (Data_Rx->Data[dlen+1] << 8) | Data_Rx->Data[dlen]) * 100;
 						if( freq > 0 ) {
 							//setupChannel_dyn(chidx, freq, 0);
 							xxx("Setup channel[idx=%d,freq=%.1F]\r\n", chidx, freq, 6);
