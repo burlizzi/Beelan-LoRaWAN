@@ -684,20 +684,23 @@ bool LORA_join_Accept(sBuffer *Data_Rx,sLoRa_Session *Session_Data, sLoRa_OTAA *
 				//get the rx2 DR
 				Session_Data->RX2DR=(dataRates_t)(Data_Rx->Data[11] & 0xf);
 
+				xxx("received DR=SF%d",12-Session_Data->RX2DR);
 
 
 				int dlen = 13;
-				if (LMIC.frame[13 + 15] == 0) { // must be CFList type 0
-					for( u1_t chidx=3; chidx<8 && dlen<RFM_Package.Counter; chidx++, dlen+=3 ) {
-						s4_t freq = rdFreq(&Data_Rx->Data[dlen]);
+				if (Data_Rx->Data[13 + 15] == 0) { // must be CFList type 0
+					xxx("let the freq sho begin");
+					for( unsigned char chidx=3; chidx<8 && dlen<RFM_Package.Counter; chidx++, dlen+=3 ) {
+						auto freq = ((Data_Rx->Data[dlen+2] << 16) | (Data_Rx->Data[dlen+1] << 8) | Data_Rx->Data[dlen]) * 100;
 						if( freq > 0 ) {
 							//setupChannel_dyn(chidx, freq, 0);
 							xxx("Setup channel[idx=%d,freq=%.1F]\r\n", chidx, freq, 6);
+						}
 					}
 				}
+				else xxx("no frequencies");
 
 
-				xxx("received DR=SF%d",12-Session_Data->RX2DR);
 
 #ifdef DEBUG
 				Serial.print(F("NwkSKey: "));
