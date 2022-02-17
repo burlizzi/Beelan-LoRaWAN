@@ -552,7 +552,6 @@ bool LORA_join_Accept(sBuffer *Data_Rx,sLoRa_Session *Session_Data, sLoRa_OTAA *
 
 	message_t Message_Status = NO_MESSAGE;
 
-	LoRa_Settings->Datarate_Rx = SF12BW125;
 	//RFM to single receive
 	Message_Status = RFM_Single_Receive(LoRa_Settings);  
 	//If there is a message received get the data from the RFM
@@ -566,6 +565,7 @@ bool LORA_join_Accept(sBuffer *Data_Rx,sLoRa_Session *Session_Data, sLoRa_OTAA *
 	//if CRC ok breakdown package
 	if(Message_Status == CRC_OK)
 	{
+		
 		//Get MAC_Header
     	Message->MAC_Header = RFM_Data[0];
 
@@ -607,8 +607,12 @@ bool LORA_join_Accept(sBuffer *Data_Rx,sLoRa_Session *Session_Data, sLoRa_OTAA *
 
 			//Compare MIC
 			for(i = 0x00; i < 4; i++)
+			{
+				xxx("mic %d %X %X",i,Data_Rx->Data[Data_Rx->Counter + i] , Message->MIC[i]);
 				if(Data_Rx->Data[Data_Rx->Counter + i] == Message->MIC[i])
 					MIC_Check++;
+
+			}
 
 			//Check if MIC compares
 			if(MIC_Check == 0x04)

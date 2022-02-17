@@ -335,6 +335,9 @@ static void RFM_change_SF_BW(unsigned char _SF, unsigned char _BW)
 */
 static void RFM_Change_Datarate(unsigned char Datarate)
 {
+  static auto old=Datarate;
+  if (old!=Datarate)
+    xxx("datarate change=%d",old=Datarate);
 #if defined(US_915)
   switch (Datarate) {
   case 0x00:  // SF10BW125
@@ -443,6 +446,10 @@ static void RFM_Change_Datarate(unsigned char Datarate)
 */
 static void RFM_Change_Channel(unsigned char Channel)
 {
+    static auto old=Channel;
+  if (old!=Channel)
+    xxx("Channel change=%d",old=Channel);
+
 #if defined(AS_923)
   if (Channel <= 0x08)
     for(unsigned char i = 0 ; i < 3 ; ++i)

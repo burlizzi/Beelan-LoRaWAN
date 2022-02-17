@@ -150,16 +150,21 @@ bool LoRaWANClass::init(void)
 
 bool LoRaWANClass::join(void)
 {
-    bool join_status;
-    const unsigned long timeout = 6000;
+    bool join_status=false;
+    unsigned long timeout1 = 5500;
+    unsigned long timeout2 = 8000;
     unsigned long prev_millis;
 
     if (currentChannel == MULTI)
     {
         randomChannel();
     }
+    prev_millis = millis();
     // join request
     LoRa_Send_JoinReq(&OTAA_Data, &LoRa_Settings);
+    xxx("send took %dms",millis() - prev_millis);
+    timeout1+=millis() - prev_millis;
+    timeout2+=(millis() - prev_millis)*2;
     // delay(900);
     // loop for <timeout> wait for join accept
     prev_millis = millis();
@@ -167,7 +172,16 @@ bool LoRaWANClass::join(void)
     {
         join_status = LORA_join_Accept(&Buffer_Rx, &Session_Data, &OTAA_Data, &Message_Rx, &LoRa_Settings);
 
-    } while ((millis() - prev_millis) < timeout && !join_status);
+    } while ((millis() - prev_millis) < timeout1 && !join_status);
+    xxx("RX1 %s %dms",join_status?"success":"fail",millis() - prev_millis);
+    LoRa_Settings.Datarate_Rx = SF12BW125;
+    LoRa_Settings.Channel_Rx = CHRX2;
+    prev_millis = millis();
+    while ((millis() - prev_millis) < timeout2 && !join_status)
+    {
+        join_status = LORA_join_Accept(&Buffer_Rx, &Session_Data, &OTAA_Data, &Message_Rx, &LoRa_Settings);
+    }
+    xxx("RX2 %s %dms",join_status?"success":"fail",millis() - prev_millis);
 
     return join_status;
 }
