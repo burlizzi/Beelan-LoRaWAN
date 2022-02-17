@@ -690,7 +690,7 @@ message_t RFM_Single_Receive(sSettings *LoRa_Settings)
 * Arguments   : *LoRa_Settings pointer to sSettings struct
 *****************************************************************************************
 */
-void RFM_Continuous_Receive(sSettings *LoRa_Settings)
+void RFM_Continuous_Receive(sSettings *LoRa_Settings,dataRates_t dr)
 {
   //Change DIO 0 back to RxDone and DIO 1 to rx timeout
   RFM_Write(RFM_REG_DIO_MAPPING1,0x00);
@@ -702,7 +702,7 @@ void RFM_Continuous_Receive(sSettings *LoRa_Settings)
 	//Change Datarate and channel.
   // This depends on regional parameters
 #ifdef EU_868
-  RFM_Change_Datarate(LoRa_Settings->RX2_Datarate_Rx);
+  RFM_Change_Datarate(dr);
   RFM_Change_Channel(CHRX2);
 #else
   //Datarate for downlink should be 8 but testing on 10
