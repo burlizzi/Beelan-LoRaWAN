@@ -30,6 +30,8 @@
 
 #include "lorawan-arduino-rfm.h"
 #include "Conversions.h"
+#include <RadioLib.h>
+extern SX1278 radio;
 
 LoRaWANClass::LoRaWANClass()
 {
@@ -145,7 +147,7 @@ bool LoRaWANClass::init(void)
     delay(50);
 
     //Initialize RFM module
-    if (!RFM_Init())
+    if (radio.begin())
     {
         return 0;
     }

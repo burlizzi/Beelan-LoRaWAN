@@ -35,7 +35,6 @@
 #include <Arduino.h>
 #include "AES-128.h"
 #include "Encrypt.h"
-#include "RFM95.h"
 #include "LoRaMAC.h"
 #include "Struct.h"
 #include "Config.h"

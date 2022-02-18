@@ -32,13 +32,15 @@
 
 #include <SPI.h>
 #include "AES-128.h"
-#include "RFM95.h"
 #include "Encrypt.h"
 #include "LoRaMAC.h"
 #include "Struct.h"
 #include "Config.h"
 #include "Arduino.h"
+#include <RadioLib.h>
 
+
+SX1278 radio = new Module(10, 2, 9, 3);
 /*
 *****************************************************************************************
 * FUNCTIONS
@@ -243,7 +245,9 @@ void LORA_Send_Data(sBuffer *Data_Tx, sLoRa_Session *Session_Data, sSettings *Lo
 	}
 
 	//Send Package
-	RFM_Send_Package(&RFM_Package, LoRa_Settings);
+	radio.setCodingRate()
+
+	radio.transmit(RFM_Package.Data,RFM_Package.Counter);
 
 	//Raise Frame counter
 	if(*Session_Data->Frame_Counter != 0xFFFF)
