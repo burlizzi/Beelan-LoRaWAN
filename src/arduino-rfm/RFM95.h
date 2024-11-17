@@ -113,6 +113,7 @@ void RFM_Set_OCP(unsigned char mA);
 void xxx(const char *format, ...);
 unsigned char RFM_Get_Rssi();
 
-
+void RFM_Change_Datarate(unsigned char Datarate);
+void RFM_Change_Channel(unsigned char Channel);
 #endif
 

@@ -65,9 +65,9 @@
 void LORA_Cycle(sBuffer *Data_Tx, sBuffer *Data_Rx, RFM_command_t *RFM_Command, sLoRa_Session *Session_Data,
  									sLoRa_OTAA *OTAA_Data, sLoRa_Message *Message_Rx, sSettings *LoRa_Settings)
 {
-	static const unsigned int Receive_Delay_1 = 1000;
-	static const unsigned int Receive_Delay_2 = 1000;
-	unsigned long prevTime = 0;
+	static const unsigned int Receive_Delay_1 = 4000;
+	static const unsigned int Receive_Delay_2 = 8000;
+	static unsigned long prevTime = 0;
 	unsigned char rx1_ch = LoRa_Settings->Channel_Rx;
 	#ifdef US_915   
     unsigned char rx1_dr = LoRa_Settings->Datarate_Tx+10;
@@ -77,15 +77,24 @@ void LORA_Cycle(sBuffer *Data_Tx, sBuffer *Data_Rx, RFM_command_t *RFM_Command, 
     unsigned char rx1_dr = LoRa_Settings->Datarate_Tx;
 	#endif
 
+
+	static auto old=*RFM_Command;
+	if (old!=*RFM_Command)
+	 xxx("*RFM_Command=%d",old=*RFM_Command);
   	//Transmit
-	if(*RFM_Command == NEW_RFM_COMMAND){
+	switch(*RFM_Command)
+	{
+	case NEW_RFM_COMMAND:
+	{
 		#if (SAMR34)
 		pinMode(RFM_SWITCH,OUTPUT);
 		digitalWrite(RFM_SWITCH,0); //Rf switch inside RAK module change to Tx
 		#endif	
 		//Lora send data
     	LORA_Send_Data(Data_Tx, Session_Data, LoRa_Settings);
+
 		prevTime = millis();
+		xxx("wait for piggy");
 		
 		#if (SAMR34)
 		digitalWrite(RFM_SWITCH,1); //Rf switch inside RAK module change to Rx 
@@ -102,16 +111,19 @@ void LORA_Cycle(sBuffer *Data_Tx, sBuffer *Data_Rx, RFM_command_t *RFM_Command, 
 			#endif
 			LORA_Receive_Data(Data_Rx, Session_Data, OTAA_Data, Message_Rx, LoRa_Settings);  //BUG DETECT SENDED PACKET ALWAYS (IT DOES UPDATE)
 		}
+		return;
 		//Wait rx1 window delay 
 		//Receive on RX2 if countinous mode is available
 		//check if anything if coming on class C RX2 window in class A no DIO0 flag will be activated
 		do{
 			if(digitalRead(RFM_pins.DIO0))		//Poll Rx done for getting message
 				LORA_Receive_Data(Data_Rx, Session_Data, OTAA_Data, Message_Rx, LoRa_Settings);
+			yield();
 		}while(millis() - prevTime < Receive_Delay_1);
 		//Return if message on RX2 
 		if (Data_Rx->Counter>0)return;
 		
+		xxx("listen on channel %d/%d again",rx1_ch,rx1_dr);
 		//Update time for counting 1 sec more
 		prevTime = millis(); 
 		//Return to datarate and channel for RX1
@@ -137,6 +149,7 @@ void LORA_Cycle(sBuffer *Data_Tx, sBuffer *Data_Rx, RFM_command_t *RFM_Command, 
 		//If class C continous Rx will happen
 		LORA_Receive_Data(Data_Rx, Session_Data, OTAA_Data, Message_Rx, LoRa_Settings);
 		*RFM_Command = NO_RFM_COMMAND;
+	}
 	}
 }
 
@@ -285,7 +298,7 @@ void LORA_Send_Data(sBuffer *Data_Tx, sLoRa_Session *Session_Data, sSettings *Lo
 *				*LoRa_Settings pointer to sSetting struct
 *****************************************************************************************
 */
-void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA *OTAA_Data, sLoRa_Message *Message, sSettings *LoRa_Settings)
+void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA *OTAA_Data, sLoRa_Message *Message, sSettings *LoRa_Settings,bool piggyback)
 {
 	unsigned char i;
 
@@ -303,7 +316,7 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
 	message_t Message_Status = NO_MESSAGE;
 
 	//If it is a type A device switch RFM to single receive
-	if(LoRa_Settings->Mote_Class == CLASS_A)
+	if(LoRa_Settings->Mote_Class == CLASS_A || piggyback)
 	{
 		Message_Status = RFM_Single_Receive(LoRa_Settings);  
 	}
@@ -345,6 +358,9 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
 
 			//Get frame control field
 			Message->Frame_Control = RFM_Data[5];
+
+			if (Message->Frame_Control & 32)
+				xxx("ACK received");
 
 			 //Get frame counter
 			Message->Frame_Counter = RFM_Data[7];
@@ -405,7 +421,7 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
 
 			//if the address is OK then decrypt the data
 			//Send the data to USB
-			if(Message_Status == ADDRESS_OK)
+			//if(Message_Status == ADDRESS_OK)
 			{
 
 				Data_Location = 8;
@@ -457,7 +473,7 @@ void LORA_Receive_Data(sBuffer *Data_Rx, sLoRa_Session *Session_Data, sLoRa_OTAA
 
 		if(Message_Status == WRONG_MESSAGE)
 		{
-			Data_Rx->Counter = 0x00;
+			//Data_Rx->Counter = 0x00;
  		}
 	}
 }

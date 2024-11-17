@@ -257,7 +257,14 @@
     { 0xD8, 0xE0, 0x24 }, //Channel [5], 867.5 MHz / 61.035 Hz = 14213156 = 0xD8E024
     { 0xD8, 0xEC, 0xF1 }, //Channel [6], 867.7 MHz / 61.035 Hz = 14216433 = 0xD8ECF1
     { 0xD8, 0xF9, 0xBE }, //Channel [7], 867.9 MHz / 61.035 Hz = 14219710 = 0xD8F9BE
-    { 0xD9, 0x61, 0xBE }, // RX2 Receive channel 869.525 MHz / 61.035 Hz = 14246334 = 0xD961BE    
+    { 0xD9, 0x61, 0xBE }, // RX2 Receive channel 869.525 MHz / 61.035 Hz = 14246334 = 0xD961BE
+
+  };
+#elif defined(EU_433)
+  static const PROGMEM unsigned char LoRa_Frequency[3][3] = {//[868.1 - 867.9] MHz
+    { 0x6c, 0x4b, 0x45 }, // Channel[9] 433.175 MHz / 61.035 Hz = 7097157 = 0x6C4B45    
+    { 0x6c, 0x58, 0x12 }, // Channel[9] 433.375 MHz / 61.035 Hz = 7100434 = 0x6C5812    
+    { 0x6c, 0x64, 0xde }, // Channel[9] 433.575 MHz / 61.035 Hz = 7103710 = 0x6C64DE    
   };
 #endif
 
@@ -333,7 +340,7 @@ static void RFM_change_SF_BW(unsigned char _SF, unsigned char _BW)
 * Arguments   : Datarate the datarate to set
 *****************************************************************************************
 */
-static void RFM_Change_Datarate(unsigned char Datarate)
+ void RFM_Change_Datarate(unsigned char Datarate)
 {
   static auto old=Datarate;
   if (old!=Datarate)
@@ -444,7 +451,7 @@ static void RFM_Change_Datarate(unsigned char Datarate)
 * Arguments   : Channel the channel to set
 *****************************************************************************************
 */
-static void RFM_Change_Channel(unsigned char Channel)
+ void RFM_Change_Channel(unsigned char Channel)
 {
     static auto old=Channel;
   if (old!=Channel)

@@ -1,0 +1,28 @@
+{
+  "name": "Beelan-LoRaWAN",
+  "keywords": "json, rest, http, web",
+  "description": "A simple and efficient JSON library for embedded C++. ArduinoJson supports ✔ serialization, ✔ deserialization, ✔ MessagePack, ✔ fixed allocation, ✔ zero-copy, ✔ streams, ✔ filtering, and more. It is the most popular Arduino library on GitHub ❤❤❤❤❤. Check out arduinojson.org for a comprehensive documentation.",
+  "homepage": "https://arduinojson.org/?utm_source=meta&utm_medium=library.json",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BeelanMX/Beelan-LoRaWAN"
+  },
+  "version": "6.18.5",
+  "authors": {
+    "name": "Benoit Blanchon",
+    "url": "https://blog.benoitblanchon.fr"
+  },
+  "exclude": [
+    ".github",
+    "extras"
+  ],
+  "frameworks": "*",
+  "platforms": "*",
+  "build": {
+    "libArchive": false
+  },
+  "dependencies":
+  {
+      "RadioLib": "^5.1.2"
+  }
+}
