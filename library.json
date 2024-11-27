@@ -23,6 +23,6 @@
   },
   "dependencies":
   {
-      "RadioLib": "^5.1.2"
+      "RadioLib": "^7.1.0"
   }
 }
